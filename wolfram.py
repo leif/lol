@@ -10,7 +10,7 @@ if len(sys.argv) != 4:
     print "Usage: %s rule width count" % (sys.argv[0],)
     sys.exit(1)
 rule, width, count = map(int, sys.argv[1:] )
-world = [0] * (width/2) + [ 1 ] + [0] * (width/2)
+world = [0] * (width/2) + [ 1 ] * (width/2)
 y = 0
 while True:
     print "".join( " *"[cell] for cell in world )

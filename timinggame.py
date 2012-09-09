@@ -17,7 +17,7 @@ while True:
     now = time()
     delta = (now - prev) * times
     print "\x1b[H\x1b[2J"
-    print " target:", "*" * halfWidth
+    print "       :", "*" * halfWidth
     for period in sorted(data):
         datum = data[ period ]
         datum.append( delta )

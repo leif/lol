@@ -1,13 +1,12 @@
+from sys import argv
 from time import time, sleep
 from collections import deque
 
-times  = 4
-width  = 80
-height = 24
-levels = height-4
+times = 4  if len(argv) < 2 else int(argv[1])
+lines = 20 if len(argv) < 3 else int(argv[2])
+width = 50
 
-halfWidth = width / 2
-data = dict((p, deque([],p)) for p in (2**b for b in range(levels)))
+data = dict((p, deque([],p)) for p in (2**b for b in range(lines)))
 ratios = {}
 
 prev = time()
@@ -17,17 +16,17 @@ while True:
     now = time()
     delta = (now - prev) * times
     print "\x1b[H\x1b[2J"
-    print "       :", "*" * halfWidth
+    print "        ", "_" * width
     for period in sorted(data):
         datum = data[ period ]
         datum.append( delta )
         ratios[ period ] = sum(datum)/float(len(datum))
     for period in sorted(ratios):
-        print "%8s %s" % (len(data[period]), "*" * int(halfWidth*ratios[period]))
-    if tuple(set( int(halfWidth*r) for r in ratios.values() )) == (halfWidth,):
-        print "WIN! took %s iterations!" % i
+        print "%8s %s" % (len(data[period]), "*" * int(width*ratios[period]))
+    if tuple(set( int(width*r) for r in ratios.values() )) == (width,):
+        print "WIN! score is %s" % i
         break
-    print " target:", "*" * halfWidth
-    print "Instructions: hit the enter key, %s times per second" % times
+    print "        ", "^" * width
+    print "Instructions: make all lines the correct length by hitting Enter %s times/second" % times
     prev = now
     raw_input()

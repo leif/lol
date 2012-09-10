@@ -3,30 +3,38 @@ from time import time, sleep
 from collections import deque
 
 times = 4  if len(argv) < 2 else int(argv[1])
-lines = 20 if len(argv) < 3 else int(argv[2])
-width = 50
+width = 4 if len(argv) < 3 else int(argv[2])
+level = 1  if len(argv) < 4 else int(argv[3])
 
-data = dict((p, deque([],p)) for p in (2**b for b in range(lines)))
-ratios = {}
+data = [ deque([], 1) ]
 
-prev = time()
+start = time()
+prev  = time()
 i = 0
 while True:
+    now   = time()
+    value = (now - prev) * times
+    prev  = now
+    clock = now - start
+    print "\x1b[H\x1b[2J",
+    if i > 0:
+        seconds = clock % 60
+        minutes = (clock - seconds)/60
+        print "Level %s. After %dm %ds, cumulative mean time is %.3f%% of target " % (level,minutes,seconds, 100*clock/i*times)
+    else:
+        print "Level %s" % level
     i += 1
-    now = time()
-    delta = (now - prev) * times
-    print "\x1b[H\x1b[2J"
     print "        ", "_" * width
-    for period in sorted(data):
-        datum = data[ period ]
-        datum.append( delta )
-        ratios[ period ] = sum(datum)/float(len(datum))
-    for period in sorted(ratios):
-        print "%8s %s" % (len(data[period]), "*" * int(width*ratios[period]))
-    if tuple(set( int(width*r) for r in ratios.values() )) == (width,):
-        print "WIN! score is %s" % i
-        break
+    means = []
+    for period in data:
+        period.append( value )
+        mean = int(width * sum(period)/float(len(period)))
+        means.append( mean )
+        print "%8s %s" % (len(period), "*" * mean)
     print "        ", "^" * width
     print "Instructions: make all lines the correct length by hitting Enter %s times/second" % times
-    prev = now
+    if list(set( means )) == [width]:
+        level += 1
+        width += 1
+        data.append( deque( data[-1], 2**level ) )
     raw_input()

@@ -34,7 +34,7 @@ while True:
     print "        ", "^" * width
     print "Instructions: make all lines the correct length by hitting Enter %s times/second" % times
     if list(set( means )) == [width]:
+        data.append( deque( data[-1], 2**level ) )
         level += 1
         width += 1
-        data.append( deque( data[-1], 2**level ) )
     raw_input()

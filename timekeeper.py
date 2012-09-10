@@ -1,3 +1,5 @@
+"A game where you must keep time"
+# by Leif Ryge, 2012, WTFPL
 from sys         import argv
 from time        import time
 from collections import deque

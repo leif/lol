@@ -20,7 +20,7 @@ while True:
     if i > 0:
         seconds = clock % 60
         minutes = (clock - seconds)/60
-        print "Level %s. After %dm %ds, cumulative mean time is %.3f%% of target " % (level,minutes,seconds, 100*clock/i*times)
+        print "Level %s. After %dm %ds, cumulative mean is %.3f%% of target " % (level,minutes,seconds, 100*clock/i*times)
     else:
         print "Level %s" % level
     i += 1

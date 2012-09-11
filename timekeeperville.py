@@ -3,9 +3,10 @@
 from time import time
 from collections import deque
 ask    = "y" == raw_input("Adjust settings? [yN] ")
-rate   = int(ask and raw_input("Rate per second? [default=4] ") or 4)
-level  = int(ask and raw_input("Starting level?  [default=1] ") or 1)
-base   = int(ask and raw_input("Window size base [default=2] ") or 2)
+rate   = int(ask and raw_input("Rate per second?      [default=4] ") or 4)
+level  = int(ask and raw_input("Starting level?       [default=1] ") or 1)
+base   = int(ask and raw_input("Window size base?     [default=2] ") or 2)
+pause  = int(ask and raw_input("Seconds before pause? [default=3] ") or 3)
 data   = [deque([], 1)]
 widths = [level]
 prev   = 0
@@ -16,7 +17,7 @@ while True:
     now   = time()
     delta = now - prev
     prev  = now
-    if delta > 3:
+    if delta > pause:
         win = False
         print "Instructions: keep all lines at correct length by hitting Enter %s times/second" % rate
     else:

@@ -4,7 +4,7 @@ from sys         import argv
 from time        import time
 from collections import deque
 rate  = 4 if len(argv) < 2 else int(argv[1])
-level = 4 if len(argv) < 3 else int(argv[2])
+level = 1 if len(argv) < 3 else int(argv[2])
 data  = [ deque([], 1) ]
 start = time()
 prev  = start - (1.0/rate)
@@ -23,7 +23,7 @@ while True:
         widths.append( width )
     win = len(data) > 1 and list(set( widths[:level] )) == [ level ]
     print "\x1b[H\x1b[2J\x0d",
-    print "Level %-3s|" % (level-3), "_v"[win] * level
+    print "Level %-3s|" % level, "_v"[win] * level
     print "\n".join("%9s| %s" % (len(window),"=>"[win]*width) for window, width in zip(data[:level], widths))
     print "%3dm %2ds |" % (minutes, seconds), "^!"[win] * level
     print "Instructions: make all lines the correct length by hitting Enter %s times/second" % rate

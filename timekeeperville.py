@@ -27,5 +27,11 @@ while True:
     print "\n".join("%9s| %s" % (len(window),"=>"[win]*width) for window, width in zip(data[:level], widths))
     print "%3dm %2ds |" % (minutes, seconds), "^!"[win] * level
     print "Instructions: make all lines the correct length by hitting Enter %s times/second" % rate
+    print "Hit z (and Enter) to pause, or ctrl-C to quit.",
     if win: level+=1
-    raw_input()
+    if raw_input() == "z":
+        print "Paused. Hit Enter again to continue."
+        raw_input()
+        pause  = time() - prev
+        start += pause
+        prev  += pause

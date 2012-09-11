@@ -1,5 +1,5 @@
 "timekeeperville is a game where you must keep time"
-# by Leif Ryge, 2012, WTFPL
+# by Leif Ryge, September 2012, WTFPL
 from sys         import argv
 from time        import time
 from collections import deque
@@ -23,9 +23,9 @@ while True:
         widths.append( width )
     win = len(data) > 1 and list(set( widths[:level] )) == [ level ]
     print "\x1b[H\x1b[2J\x0d",
-    print "Instructions: make all lines the correct length by hitting Enter %s times/second" % rate
     print "Level %-3s|" % (level-3), "_v"[win] * level
     print "\n".join("%9s| %s" % (len(window),"=>"[win]*width) for window, width in zip(data[:level], widths))
     print "%3dm %2ds |" % (minutes, seconds), "^!"[win] * level
+    print "Instructions: make all lines the correct length by hitting Enter %s times/second" % rate
     if win: level+=1
     raw_input()

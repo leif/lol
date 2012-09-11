@@ -1,37 +1,32 @@
 "timekeeperville is a game where you must keep time"
 # by Leif Ryge, September 2012, WTFPL
-from sys         import argv
-from time        import time
+from time import time
 from collections import deque
-rate  = 4 if len(argv) < 2 else int(argv[1])
-level = 1 if len(argv) < 3 else int(argv[2])
-data  = [ deque([], 1) ]
-start = time()
-prev  = start - (1.0/rate)
+ask    = "y" == raw_input("Adjust settings? [yN] ")
+rate   = int(ask and raw_input("Rate per second? [default=4] ") or 4)
+level  = int(ask and raw_input("Starting level?  [default=1] ") or 1)
+base   = int(ask and raw_input("Window size base [default=2] ") or 2)
+data   = [deque([], 1)]
+widths = [level]
+prev   = 0
+clock  = 0
 while True:
-    now     = time()
-    clock   = now - start
-    delta   = now - prev
-    prev    = now
-    seconds = clock % 60
-    minutes = (clock - seconds)/60
-    widths  = []
-    if len(data[-1]) == 2**(len(data)-1): data.append(deque(data[-1], 2**len(data)))
-    for window in data:
-        window.append( delta )
-        width = int(0.5+((level)*sum((delta*rate) for delta in window)/float(len(window))))
-        widths.append( width )
-    win = len(data) > 1 and list(set( widths[:level] )) == [ level ]
     print "\x1b[H\x1b[2J\x0d",
-    print "Level %-3s|" % level, "_v"[win] * level
-    print "\n".join("%9s| %s" % (len(window),"=>"[win]*width) for window, width in zip(data[:level], widths))
-    print "%3dm %2ds |" % (minutes, seconds), "^!"[win] * level
-    print "Instructions: make all lines the correct length by hitting Enter %s times/second" % rate
-    print "Hit z (and Enter) to pause, or ctrl-C to quit.",
+    if len(data[-1]) == base**(len(data)-1): data.append(deque(data[-1], base**len(data)))
+    now   = time()
+    delta = now - prev
+    prev  = now
+    if delta > 3:
+        win = False
+        print "Instructions: keep all lines at correct length by hitting Enter %s times/second" % rate
+    else:
+        clock += delta
+        widths = []
+        for window in data:
+            window.append( delta*rate )
+            widths.append( int(0.5+(level*sum(window)/float(len(window)))) )
+        win = len(data)>1 and [level]==list(set(widths[:level]))
+        print "Level %-3s|" % level, "=v"[win]*level
+    print "\n".join("%%9s| %%%ds"%level%(len(window),"#>"[win]*width) for window,width in zip(data[:level], widths))
+    raw_input("%-9s| %s "%("%d:%.2d"%((clock-clock%60)/60,clock%60), "^!"[win]*level)) == "q" and exit()
     if win: level+=1
-    if raw_input() == "z":
-        print "Paused. Hit Enter again to continue."
-        raw_input()
-        pause  = time() - prev
-        start += pause
-        prev  += pause

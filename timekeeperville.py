@@ -22,8 +22,7 @@ while True:
         print "Instructions: hit Enter %s times/second to keep all lines at correct length" % rate
     else:
         if len(data[-1]) == base**(len(data)-1): data.append(deque(data[-1], base**len(data)))
-        for window in data:
-            window.append( delta*rate )
+        for window in data: window.append( delta*rate )
         clock += delta
         widths = [ int(level*sum(window)/len(window)+0.5) for window in data[:level] ]
         win    = len(data)>1 and [level]==list(set(widths))
@@ -31,9 +30,9 @@ while True:
         best   = max(streak, best)
         limit  = max(limit, level+best)
         left   = (left-delta, limit)[win]
-        score  = win and left > 1 and score+left*streak or score
+        if win and left > 1: score+=left*streak
         print "Level %-3s|" % level, "=!"[win]*level, streak>1 and "%s streak!"%streak or win and ":)" or "too %s"%('slow','fast')[delta*rate<1]
-    print "\n".join("%%9s| %%%ds"%(alt and level)%(len(window),"#>"[win]*width) for window,width in zip(data[:level], widths))
-    raw_input("%-6s%4s %s Score: %s \n"%("%d:%.2d"%((left-left%60)/60,left%60),"[%s]"%best,"=!"[win]*level,score)) == "q" and exit()
-    if left < 1: exit("Out of time! Played %dm%.2ds, taking %.1f seconds per level" % ((clock-clock%60)/60,clock%60,clock/level))
+    print "\n".join("%%9s| %%%ds"%(alt and level)%(len(window),"#>"[win]*width) for window,width in zip(data,widths))
+    raw_input("%-6s%4s %s Score: %s \n"%("%d:%.2d"%(left/60,left%60),"[%s]"%best,"=!"[win]*level,score)) == "q" and exit()
+    if left < 1: exit("Out of time! Played %dm%.2ds, taking %.1f seconds per level" % (clock/60,clock%60,clock/level))
     if win: level+=1

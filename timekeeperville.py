@@ -4,7 +4,7 @@ from time import time
 from collections import deque
 results = []
 while True:
-    adj   = raw_input("Adjust settings? [yN] ")=="y"
+    adj   = raw_input("Use default settings? [Yn] ")=="n"
     bpm   = int(adj and raw_input("Initial BPM?        [default=120] ") or 120)
     level = int(adj and raw_input("Initial level?        [default=1] ") or 1  )
     limit = int(adj and raw_input("Initial time limit?  [default=15] ") or 15 )

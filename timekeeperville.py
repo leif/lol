@@ -39,4 +39,4 @@ while True:
         if limit == 0: break
         if win: level+=1
     results.append( "%s BPM, %dm %.2ds of play, level %02d, best streak was %s, score %d\n" % (bpm,clock/60,clock%60,level,best,score) )
-    while "y"!=raw_input("%s%s\nHit y to play again, or ctrl-c to quit\n" % (clear, "".join(reversed(results)))): pass
+    while "y"!=raw_input("%s%s\n y to play again, or ctrl-c to quit\n " % (clear, "".join(reversed(results)))): pass

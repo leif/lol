@@ -4,32 +4,33 @@ from time import time
 from collections import deque
 results = []
 while True:
-    adj   = raw_input("Use default settings? [Yn] ")=="n"
-    bpm   = int(adj and raw_input("Initial BPM?        [default=120] ") or 120)
-    level = int(adj and raw_input("Initial level?        [default=1] ") or 1  )
-    limit = int(adj and raw_input("Initial time limit?  [default=15] ") or 15 )
-    base  = int(adj and raw_input("Window size base?     [default=2] ") or 2  )
-    pause = int(adj and raw_input("Inactivity threshold? [default=2] ") or 2  )
-    accel = int(adj and raw_input("Time to accelerate? [default=180] ") or 180)
-    alt   = adj and raw_input("Alternate display mode? [yN] ") == "y" or 0
-    data, widths = [deque([1], 1)], [level]
+    adj   = raw_input("Use default settings?   [Yn] ") == "n"
+    bpm   = int(adj and raw_input("Initial BPM?           [120] ") or 120)
+    level = int(adj and raw_input("Initial level?           [1] ") or 1  )
+    limit = int(adj and raw_input("Initial time limit?     [15] ") or 15 )
+    base  = int(adj and raw_input("Window size base?        [2] ") or 2  )
+    pause = int(adj and raw_input("Inactivity threshold?    [2] ") or 2  )
+    accel = int(adj and raw_input("Time to accelerate?    [180] ") or 180)
+    invrt =     adj and raw_input("Invert row length?      [yN] ") == "y"
+    alt   =     adj and raw_input("Alternate display mode? [yN] ") == "y" or 0
+    data = [ deque([1], 1) ]
     prev, clock, streak, best, score, clear = 0, 0, 0, 0, 0, "\x1b[H\x1b[2J\x0d"
     while True:
         print clear,
         delta = time()-prev
         prev += delta
-        bps   = bpm / 60.0
+        bps   = bpm/60.0
         if delta > pause:
-            print "\nInstructions: hit Enter %s times/minute to keep all rows at the target length." % bpm
+            print "\nInstructions: hit Enter %s times/minute to keep all rows at the target length."%bpm
             raw_input("The rows represent your accuracy averaged over increasingly lengthy periods. \n")
             continue
-        for window in data: window.append( delta*bps )
+        for window in data: window.append( invrt and 1.0/(delta*bps) or delta*bps )
         if len(window) == window.maxlen: data.append(deque(window, base**len(data)))
         widths = [ int(level*sum(window)/len(window)+0.5) for window in data[:level] ]
         win    = len(data)>1 and [level]==list(set(widths))
         streak = win and streak+1 or 0
         best   = max(streak, best)
-        limit  = (max(0,limit-delta), limit+level+streak )[win]
+        limit  = win and limit+level+streak or max(0, limit-delta)
         clock += delta
         if limit == 0: break
         if win: score+=(limit+best)*streak

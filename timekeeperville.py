@@ -13,8 +13,7 @@ while True:
     accel = int(adj and raw_input("Time to accelerate?    [180] ") or 180)
     invrt =     adj and raw_input("Invert row length?      [yN] ") == "y"
     alt   =     adj and raw_input("Alternate display mode? [yN] ") == "y" or 0
-    data = [ deque([1], 1) ]
-    prev, clock, streak, best, score, clear = 0, 0, 0, 0, 0, "\x1b[H\x1b[2J\x0d"
+    prev, clock, streak, best, score, clear, data = 0, 0, 0, 0, 0, "\x1b[H\x1b[2J\x0d", [ deque([1], 1) ]
     while True:
         print clear,
         delta = time()-prev
@@ -34,9 +33,9 @@ while True:
         clock += delta
         if limit == 0: break
         if win: score+=(limit+best)*streak
-        if win and streak < 2 and limit>accel: bpm += 20
+        if win and streak<2 and limit>accel: bpm += 20
         print "Level %-3s|%s| %s"%(level, "=!"[win]*level, streak>1 and "%s streak!"%streak or win and ":)" or "%s BPM is %s"%(bpm,('slower','faster')[delta*bps>1]))
-        print "\n".join("%%9s|%%%ds| %%s"%(alt and level)%(len(window),".*"[win]*width,len(window)==1 and "%d BPM"%(60/delta) or "") for window,width in zip(data,widths))
+        print "\n".join("%%9s|%%%ds| %%s"%((alt or level>29) and level)%(len(window)," *.,-+:;% "[win or 2+((level/4)%8)]*width,len(window)==1 and "%d BPM"%(60/delta) or "<>="[width<level or width==level and 2 or 0]) for window,width in zip(data,widths))
         if "q"==raw_input("%-6s%4s%s| Score: %d "%("%2d:%.2d"%(limit/60,limit%60),"[%s]"%best,"=!"[win]*level,score)): break
         if win: level+=1
     results.append( "%3s BPM, %dm %.2ds of play, level %02d, best streak was %s, score %d\n" % (bpm,clock/60,clock%60,level,best,score) )

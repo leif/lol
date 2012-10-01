@@ -24,7 +24,7 @@ while True:
             raw_input("The rows represent your accuracy averaged over increasingly lengthy periods. \n")
             continue
         for window in data: window.append( invrt and 1.0/(delta*bps) or delta*bps )
-        if len(window) == window.maxlen: data.append(deque(window, base**len(data)))
+        if len(window) == base**(len(data)-1): data.append(deque(window, base**len(data)))
         widths = [ int(level*sum(window)/len(window)+0.5) for window in data[:level] ]
         win    = len(data)>1 and [level]==list(set(widths))
         streak = win and streak+1 or 0

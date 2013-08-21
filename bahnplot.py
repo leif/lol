@@ -47,7 +47,7 @@ def plot( filename, expr="(1-(1.0/(2**x)))**(2**x)", bounds="0,60,0,1", size="10
         try:
             y = int(height-scale( Y, minY, maxY, 1, height ))
         except AssertionError:
-            next        
+            next
         img.putpixel( (x,y), 1 )
     img.save( filename )
 if __name__ == "__main__":

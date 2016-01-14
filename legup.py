@@ -327,7 +327,7 @@ def lightshow5(w=180, h=60, n=0, pallete=' #', ticks=0, color=0):
         print CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color)
         print n
 
-def lightshow6(w=180, start=1.08, stop=2, steps=1000):
+def lightshow6(w=180, start=1.05, stop=1.99, steps=1000):
     n=0
     while True:
         n+=1

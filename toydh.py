@@ -3,6 +3,8 @@ import sys
 
 """
 playing around with diffie-hellman
+
+watch out, there is some very confused stuff here
 """
 
 # "The primality of the number has been rigorously proven" - RFC 2412
@@ -49,7 +51,7 @@ def toydh(a,b=None,p=small_p):
     """
     >>> from random import randrange
     >>> order = len(residues(small_p)); order
-    7
+    63
     >>> alice_private = randrange(order)
     >>> alice_public  = toydh(alice_private)
     >>> bob_private   = randrange(order)
@@ -104,14 +106,14 @@ def test(g,p,q,a,b,z):
     if (not a % 2) and (not b % 2):
         Au = p - A
         Bu = p - B
-        assert pow(Au,b,p) == pow(B,a,p) ==\
-               pow(Bu,a,p) == pow(A,b,p), (g,p,q,a,b)
+        assert pow(Au,b,p) == pow(B, a,p) ==\
+               pow(A, b,p) == pow(Bu,a,p), (g,p,q,a,b)
 
 def test_(p, q, gs, n):
     """
-    >>> gs=generators(127,7)
+    >>> #gs=generators(127,7)
     >>> test_(127, 7, generators(127, 7), 7)
-    >>> test_(47, 23, generators(47, 23), 23)
+    >>> #test_(47, 23, generators(47, 23), 23)
     >>> test_(oakley2_p, oakley2_q, range(10), 10)
     >>> test_(rfc3526_p, rfc3526_q, [2], 10)
     """
@@ -123,6 +125,7 @@ def test_(p, q, gs, n):
 
 def generators(p,q):
     """
+    i forget wat made me write this part
     >>> gs = set(generators(127,7))
     >>> gs == set([2**i for i in range(1,7)])
     True
@@ -130,25 +133,31 @@ def generators(p,q):
     r = (p-1)/q
     return [pow(h,r,p) for h in range(2,p) if pow(h,r,p) != 1]
 
-def first_generator(p,q):
-    r = (p-1)/q
-    h=2
-    while True:
-        if pow(h,r,p) != 1:
-            return pow(h,r,p)
-
 def residues(p):
     """
-    >>> sorted(residues(127))
-    [1, 2, 4, 8, 16, 32, 64]
-    >>> len(residues(47))
-    23
+
+    >>> for p in primes(1000):
+    ...     assert len(residues(p)) == (p-1)/2
     """
-    return set(toydh(i, None, p) for i in range(p))
+    return set(pow(i, 2, p) for i in range(1,(p+1)/2))
+
+def primes(upperBound):
+    """
+    Returns a list of all prime numbers less than upperBound.
+    >>> primes(50)
+    [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
+    """
+    numbers = range(2, upperBound)
+    primes = []
+    while numbers:
+        prime = numbers.pop(0)
+        primes.append(prime)
+        numbers = [n for n in numbers if n % prime]
+    return primes
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         import doctest
-        print doctest.testmod()
+        print doctest.testmod(verbose=0)
     else:
         print toydh(*map(int,sys.argv[1:]))

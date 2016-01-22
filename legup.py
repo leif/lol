@@ -189,6 +189,14 @@ def render_legendre(max_a=76, max_p=62, pallete=" #_", ticks=2, x_offset=0, op=0
     """
     return render_matrix(create_leg_matrix(max_a, max_p, x_offset, op, ticks), pallete, ticks, color)
 
+def render_legendre_png(max_a=800, max_p=62, filename='legendre.png', x_offset=0):
+    from PIL import Image
+    m = create_leg_matrix(max_a, max_p, x_offset)
+    img = Image.new( 'RGB', (max_a, len(m)) )
+    for y in range(len(m)):
+        for x in range(len(m[y])):
+            img.putpixel( (x,y), ( (0,0,0), (0,255,0), (255,255,255) )[m[y][x]+1] )
+    img.save(filename)
 
 class MThoma:
 

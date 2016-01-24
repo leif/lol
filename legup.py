@@ -189,14 +189,24 @@ def render_legendre(max_a=76, max_p=62, pallete=" #_", ticks=2, x_offset=0, op=0
     """
     return render_matrix(create_leg_matrix(max_a, max_p, x_offset, op, ticks), pallete, ticks, color)
 
-def render_legendre_png(max_a=800, max_p=62, filename='legendre.png', x_offset=0):
-    from PIL import Image
+def render_legendre_png(scale=2, max_a=512, max_p=2680, ellipse=0, x_offset=0, filename=None):
+    from PIL import Image, ImageDraw
+    import time
+    if filename is None:
+        filename="legendre-%08x.png" % (int(time.time()),)
     m = create_leg_matrix(max_a, max_p, x_offset)
-    img = Image.new( 'RGB', (max_a, len(m)) )
+    w, h = (max_a*scale, len(m)*scale)
+    img = Image.new( 'RGB', (w,h) )
+    draw = ImageDraw.Draw(img)
     for y in range(len(m)):
         for x in range(len(m[y])):
-            img.putpixel( (x,y), ( (0,0,0), (0,255,0), (255,255,255) )[m[y][x]+1] )
+            f = draw.rectangle
+            if ellipse:
+                f = draw.ellipse
+            f( ( (x*scale, y*scale), ( x*scale+scale-1, y*scale+scale-1) ),
+                fill=( (0,0,0), (255,255,255), (0,255,0) )[m[y][x]+1] )
     img.save(filename)
+    return "Saved %sx%x image to %s" % (w,h,filename)
 
 class MThoma:
 
@@ -340,6 +350,23 @@ def lightshow6(w=180, start=1.05, stop=1.99, steps=1000):
     while True:
         n+=1
         print CL + render_ticks(w, start + (stop-start)*(float(osc(steps,n))/steps))
+
+def lightshow7(w=180, h=60, n=0, pallete=' #', ticks=0, color=0):
+    while True:
+        n+=1
+        if n%120 < 12 and (n%20)%4:
+            # ugly :(
+            continue
+        z=60
+#        m = [ [isPrime((x+( 10+(osc(z,n) ) **2))%(10+y)) for x in range(w)] for y in range(h) ]
+        m = [ [isPrime((x+(
+            (10+(osc(z,n))**2)
+            if n%(4*z) >= (2*z) else
+            (10-(osc(z,n))**2)
+            ))%(10+y)) for x in range(w)] for y in range(h) ]
+        print CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color)
+        print n, osc(z,n), n/20
+
 
 def scroll_legendre(max_a=130, max_p=223, pallete=" #_", ticks=2, op=0, color=0):
     n=0

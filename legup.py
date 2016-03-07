@@ -368,7 +368,21 @@ def lightshow7(w=180, h=60, n=0, pallete=' #', ticks=0, color=0):
         print n, osc(z,n), n/20
 
 
-def scroll_legendre(max_a=130, max_p=223, pallete=" #_", ticks=2, op=0, color=0):
+def bz2_matrix(w, h):
+    import bz2
+    m = [ [0 for x in range(w+1)] for y in range(h) ]
+    for y in range(h):
+        v = (y+1)*10000
+        x = len(bz2.compress('\x00' * v))
+        m[y][x] = 1
+        m[y][-1] = v
+    return m
+
+def render_bz2(w=100, h=50):
+    m = bz2_matrix(w, h)
+    print render_matrix(m, minValue=0, pallete=" *", ticks=1)
+
+def scroll_legendre(max_a=130, max_p=223, pallete=" #_", ticks=0, op=0, color=0):
     n=0
     while True:
         n+=1

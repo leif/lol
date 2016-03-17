@@ -20,7 +20,9 @@ some actual graphics :)
 
 __author__ = "Leif Ryge <leif@synthesize.us>"
 
+import time
 import math
+from lnohof import memo
 
 try:
     from xtermcolor import colorize
@@ -152,7 +154,7 @@ def create_leg_matrix(w, h, x_offset=0, op=0, ticks=0):
     >>> create_leg_matrix(31, 128) == wikipedia_matrix
     True
     """
-    return [[calculateLegendre(a+x_offset,p) for a in range(w)]+([p] if ticks else []) for p in range(3, h) if op or isPrime(p)]
+    return [[calculateLegendre(a+x_offset,p) for a in range(1,w)]+([p] if ticks else []) for p in range(2, h) if op or isPrime(p)]
 
 
 def render_legendre(max_a=76, max_p=62, pallete=" #_", ticks=2, x_offset=0, op=0, color=0):
@@ -191,7 +193,6 @@ def render_legendre(max_a=76, max_p=62, pallete=" #_", ticks=2, x_offset=0, op=0
 
 def render_legendre_png(scale=2, max_a=512, max_p=2680, ellipse=0, x_offset=0, filename=None):
     from PIL import Image, ImageDraw
-    import time
     if filename is None:
         filename="legendre-%08x.png" % (int(time.time()),)
     m = create_leg_matrix(max_a, max_p, x_offset)
@@ -208,11 +209,63 @@ def render_legendre_png(scale=2, max_a=512, max_p=2680, ellipse=0, x_offset=0, f
     img.save(filename)
     return "Saved %sx%x image to %s" % (w,h,filename)
 
+def render_legendre_svg_take1(scale=2, max_a=100, max_p=1000, ellipse=0, x_offset=0, filename=None):
+    import svgwrite
+    from svgwrite import cm, mm
+    if filename is None:
+        filename="legendre-%08x.svg" % (int(time.time()),)
+    m = create_leg_matrix(max_a, max_p, x_offset)
+    w, h = (max_a*scale, len(m)*scale)
+    d = svgwrite.Drawing(filename=filename, debug=True)
+    for y in range(len(m)):
+        for x in range(len(m[y])):
+            v = m[y][x]
+            if v == 0:
+                d.add(d.circle(center=(x*cm, y*cm), r=0.5*cm, fill='black'))
+            elif v == 1:
+#                d.add(d.circle(center=(x*cm, y*cm), r=0.2*cm, stroke='red', fill='white', stroke_width=1*mm))
+                d.add(d.circle(center=(x*cm, y*cm), r=0.2*cm, fill='black'))
+                
+    d.save()
+    return "Saved %sx%x svg to %s" % (w,h,filename)
+
+def render_legendre_svg(w=100, h=200, filename=None):
+    import svgwrite
+    from svgwrite import cm, mm
+    if filename is None:
+        filename="legendre-%08x.svg" % (int(time.time()),)
+    m = create_leg_matrix(h+1, nthprime(w+1))
+    d = svgwrite.Drawing(filename=filename, debug=True)
+    assert w == len(m)
+    assert h == len(m[0])
+    for x in range(w):
+        for y in range(h):
+            v = m[x][h-y-1]
+            if v == 0:
+                d.add(d.circle(center=(x*cm, y*cm), r=0.5*cm, fill='black'))
+            elif v == 1:
+#                d.add(d.circle(center=(x*cm, y*cm), r=0.2*cm, stroke='red', fill='white', stroke_width=1*mm))
+                d.add(d.circle(center=(x*cm, y*cm), r=0.2*cm, fill='black'))
+                
+    d.save()
+    return "Saved %sx%x svg to %s" % (w,h,filename)
+
+def nthprime(n):
+    "return the nth prime"
+    i = 0
+    j = 1
+    while i < n:
+        j+=1
+        if isPrime(j):
+            i+=1
+    return j
+
 class MThoma:
 
     # this stuff is from http://martin-thoma.com/calculate-legendre-symbol/
 
     @staticmethod
+    #@memo
     def isPrime(a):
         # lol
         return all(a % i for i in xrange(2, a))
@@ -303,7 +356,7 @@ def lightshow1(w=180, h=60, n=0, pallete=' #', ticks=0, color=0):
 def lightshow1(w=180, h=60, n=0, pallete=' #', ticks=0, color=0):
     while True:
         n+=1
-        m = [ [isPrime((x+n)%(5+y)) for x in range(w)] for y in range(h) ]
+        m = [ [isPrime((x+n)%(1+y)) for x in range(w)] for y in range(h) ]
         print CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color)
         print n
 

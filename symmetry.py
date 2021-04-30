@@ -13,7 +13,7 @@ def trier(f):
 
 dechex=lambda n:int("0x%s"%n,16)
 test=lambda n: ((n**2) == trier(int)(hex(dechex(n)**2)[2:].replace('L','')), hex(dechex(n)),hex(dechex(n**2)))
-print "\n".join([ "  %s *   %s  =  %s\n%s * %s = %s" % (n,n,n**2,hex(dechex(n)),hex(dechex(n)),hex(dechex(n)**2))  for n in range(100001) if test(n)[0]])
+print("\n".join([ "  %s *   %s  =  %s\n%s * %s = %s" % (n,n,n**2,hex(dechex(n)),hex(dechex(n)),hex(dechex(n)**2))  for n in range(100001) if test(n)[0]]))
 
 
 octt=lambda n: oct(n) if n is not 0 else '00'

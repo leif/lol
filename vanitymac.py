@@ -12,15 +12,15 @@ def string2mac(s):
     r = re.compile('^[a-f0-9]{2,10}$')
     assert r.match(w)
     mac = '0'*(12-len(w))+w
-    return ":".join(mac[i*2:(i*2)+2] for i in range(len(mac)/2))
+    return ":".join(mac[i*2:(i*2)+2] for i in range(len(mac)//2))
 
 def main(limit=20, wordlist="/usr/share/dict/words"):
-    with file(wordlist) as f:
+    with open(wordlist) as f:
         words = f.read().split()+['foo']
-    words = map(str.lower,words)
+    words = list(map(str.lower,words))
     r = re.compile('^[a-f0-9oitzs]{2,10}$') # ~687k addresses
     r = re.compile('^[a-f0-9oi]{2,10}$')    # ~32k addresses
-    words = filter(r.match, words)
+    words = list(filter(r.match, words))
     pairs = [w+' '+w2 for w in words for w2 in words if len(w) + len(w2) <= 10]
 #    pairs = [w+w2 for w in words for w2 in words if len(w) + len(w2) <= 10]
 #    print len(words),"*",len(pairs),"=",len(words)*len(pairs)
@@ -33,4 +33,4 @@ def main(limit=20, wordlist="/usr/share/dict/words"):
 
 
 if __name__ == "__main__":
-    print main(*sys.argv[1:])
+    print(main(*sys.argv[1:]))

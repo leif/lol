@@ -39,7 +39,7 @@ C2007CB8 A163BF05 98DA4836 1C55D39A 69163FA8 FD24CF5F
 83655D23 DCA3AD96 1C62F356 208552BB 9ED52907 7096966D
 670C354E 4ABC9804 F1746C08 CA237327 FFFFFFFF FFFFFFFF""".replace(' ','').replace('\n','').replace('\t',''), 16)
 
-rfc3526_q = (rfc3526_p-1)/2
+rfc3526_q = (rfc3526_p-1)//2
 
 # oakley2_p is a safe prime and oakley2_q is its sophie-germain prime
 assert oakley2_q*2 + 1 == oakley2_p
@@ -130,16 +130,16 @@ def generators(p,q):
     >>> gs == set([2**i for i in range(1,7)])
     True
     """
-    r = (p-1)/q
+    r = (p-1)//q
     return [pow(h,r,p) for h in range(2,p) if pow(h,r,p) != 1]
 
 def residues(p):
     """
 
     >>> for p in primes(1000):
-    ...     assert len(residues(p)) == (p-1)/2
+    ...     assert len(residues(p)) == (p-1)//2
     """
-    return set(pow(i, 2, p) for i in range(1,(p+1)/2))
+    return set(pow(i, 2, p) for i in range(1,(p+1)//2))
 
 def primes(upperBound):
     """
@@ -147,7 +147,7 @@ def primes(upperBound):
     >>> primes(50)
     [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
     """
-    numbers = range(2, upperBound)
+    numbers = list(range(2, upperBound))
     primes = []
     while numbers:
         prime = numbers.pop(0)
@@ -158,6 +158,6 @@ def primes(upperBound):
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         import doctest
-        print doctest.testmod(verbose=0)
+        print(doctest.testmod(verbose=0))
     else:
-        print toydh(*map(int,sys.argv[1:]))
+        print(toydh(*list(map(int,sys.argv[1:]))))

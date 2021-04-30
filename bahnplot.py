@@ -37,8 +37,8 @@ def scale( v, a, b, A, B ):
     return (float(v-a) / (b-a)) * (B-A) + A
 
 def plot( filename, expr="(1-(1.0/(2**x)))**(2**x)", bounds="0,60,0,1", size="1024x768" ):
-    width, height = map(int, size.split("x"))
-    minX, maxX, minY, maxY = map(float, bounds.split(','))
+    width, height = list(map(int, size.split("x")))
+    minX, maxX, minY, maxY = list(map(float, bounds.split(',')))
     img = Image.new( '1', (width, height) )
     fn = eval("lambda x: %s" % expr)
     for x in range(width):
@@ -53,7 +53,7 @@ def plot( filename, expr="(1-(1.0/(2**x)))**(2**x)", bounds="0,60,0,1", size="10
 if __name__ == "__main__":
     from sys import argv
     if len(argv) < 2: 
-        print "usage: %s filename [expr [bounds [size]]]" % argv[0]
+        print("usage: %s filename [expr [bounds [size]]]" % argv[0])
         doctest.testmod()
     else:
         plot(*argv[1:])

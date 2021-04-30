@@ -1,5 +1,11 @@
 #!/bin/python
 """
+
+This was my solution to a programming excercise which someone told me they once
+had to solve during a job interview. I don't recall the details. I belive the
+tests passed when it was written in python2, but they no longer do now that
+2to3 has been run on it.
+
 >>> list(unrollSpiral( [[ 1, 2 ],
 ...                     [ 3, 4 ],
 ...                     [ 5, 6 ]]))
@@ -28,16 +34,16 @@
 """
 
 def spiral( w, h ):
-    for d in xrange( (min(w,h)+1)/2 ):
-        for x in xrange( d, w-d ):
+    for d in range( (min(w,h)+1)/2 ):
+        for x in range( d, w-d ):
             yield x, d
-        for y in xrange( d+1, h-d ):
+        for y in range( d+1, h-d ):
             yield w-d-1, y
         if d != h-d-1:
-            for x in reversed(xrange( d, w-d-1 )):
+            for x in reversed(range( d, w-d-1 )):
                 yield x, h-d-1
         if d != w-d-1:
-            for y in reversed(xrange( d+1, h-d-1 )):
+            for y in reversed(range( d+1, h-d-1 )):
                 yield d, y
 
 def unrollSpiral( m ):
@@ -47,7 +53,7 @@ def unrollSpiral_slow( m ):
     "this version takes O(n**2) time and O(n) space instead of O(n) and O(1)"
     while m:
         for i in m[0]: yield i
-        m = list(reversed(zip(*m[1:])))
+        m = list(reversed(list(zip(*m[1:]))))
 
 def vis( w, h ):
     from visual import sphere, scene
@@ -59,7 +65,7 @@ def vis( w, h ):
 if __name__=="__main__":
     import sys
     if len(sys.argv) > 1 and sys.argv[1] == "vis":
-            vis( *map(int, sys.argv[2:]) )
+            vis( *list(map(int, sys.argv[2:])) )
     else:
         import doctest
-        print doctest.testmod()
+        print(doctest.testmod())

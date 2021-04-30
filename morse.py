@@ -2,6 +2,11 @@
 dedicated to the person who was sending me morse coded twitter DMs for a while.
 
 this seems to mostly work though it did fail to decode a few of their messages.
+
+>>> encode('HELLO WORLD')
+'.... . .-.. .-.. --- / .-- --- .-. .-.. -.. '
+>>> decode('.... . .-.. .-.. --- / .-- --- .-. .-.. -.. ')
+'HELLO WORLD'
 """
 
 A2M  = {'A': '.-',     'B': '-...',   'C': '-.-.', 
@@ -20,11 +25,25 @@ A2M  = {'A': '.-',     'B': '-...',   'C': '-.-.',
         '9': '----.',  ' ': '/' 
         }
 
-M2A = dict((v,k) for k,v in A2M.items())
+M2A = dict((v, k) for k, v in list(A2M.items()))
 
-encode = lambda s: "".join(A2M.get(c.upper(), c)+' ' for c in s)
+encode = lambda s: "".join(A2M.get(c.upper(), c) + ' ' for c in s)
 decode = lambda s: "".join(M2A.get(c, c) for c in s.split())
+
+
+def test():
+    import doctest
+
+    doctest.testmod(verbose=True)
+
 
 if __name__ == '__main__':
     import sys
-    print globals()[sys.argv[1]](sys.argv[2])
+
+    if len(sys.argv) > 1:
+        if sys.argv[1] == 'test':
+            test()
+        else:
+            print(globals()[sys.argv[1]](sys.argv[2]))
+    else:
+        print("usage: %s <test|encode|decode> [data]")

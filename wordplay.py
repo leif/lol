@@ -3,6 +3,7 @@ import sys
 import time
 from random import choice, shuffle
 import itertools
+import codecs
 from operator import itemgetter
 def isascii(w):
     try:
@@ -13,9 +14,8 @@ def isascii(w):
 
 loadwords = lambda filename: set(
             map(str.lower,
-                filter(lambda s: len(s) > 1,
-                    filter(isascii,
-                       file(filename).read().split()))))
+                [s for s in list(filter(isascii,
+                       open(filename).read().split())) if len(s) > 1]))
 
 words = loadwords('/usr/share/dict/words')
 
@@ -28,9 +28,10 @@ ispal = lambda s: s == rev(s)
 #rev = lambda s: ''.join(reversed(s))
 rev = lambda s: s[::-1]
 
-r13 = dict( (w, w.encode('rot13')) for w in words )
+rot13 = lambda s: codecs.getencoder( "rot-13" )(s)[0]
+r13 = dict( (w, rot13(w)) for w in words )
 
-r13words = dict( (k,v) for k,v in r13.items() if v in words )
+r13words = dict( (k,v) for k,v in list(r13.items()) if v in words )
 
 palwords = set( w for w in words if w == rev(w) )
 
@@ -41,7 +42,7 @@ altpals2 = dict( (w, rev(stripapo(w))) for w in words if rev(stripapo(w)) in wor
 
 duprev = lambda s: s+' '+rev(s)
 
-randpal = lambda n: duprev(' '.join(choice(altpals.keys()) for i in range(n)))
+randpal = lambda n: duprev(' '.join(choice(list(altpals.keys())) for i in range(n)))
 
 def gnattang():
     """
@@ -51,7 +52,7 @@ def gnattang():
     """
     for word in r13words:
         if rev(word) == r13words[word]:
-            print "%s/%s" % (word, rev(word))
+            print("%s/%s" % (word, rev(word)))
 
 def fd(delta):
     "from allmydata.util.time_format.format_delta"
@@ -106,8 +107,8 @@ def findpairs(func):
         pairs = {}
         T = len(words)
         p = progressor(T, "dicts")
-        p.next()
-        print "%s words in dictionary, ^2 = %s words" % (len(words), len(words)**2)
+        next(p)
+        print("%s words in dictionary, ^2 = %s words" % (len(words), len(words)**2))
         found = 0
         for w1 in words:
             for w2 in words:
@@ -136,7 +137,7 @@ def findpairpals(w1, w2):
 r13pairs = dict()
 @findpairs
 def find_r13pairs(w1, w2):
-    c = (w1 + w2).encode('rot13')
+    c = rot13(w1 + w2)
     if c in words:
         printline("%s / %s %s" % (c, w1, w2))
         r13pairs[w1 + ' ' + w2] = c
@@ -166,15 +167,15 @@ def print_wordsquares(n=4, words=words):
     n=int(n)
     words = ['cyber'] + list(words)
     for sq in wordsquares(words, n):
-        print "\n".join(sq+('--',))
+        print("\n".join(sq+('--',)))
 
 def print_wordsquarepals(words=altpals, n=4):
     "Prints the word squares that are palindromes"
     for sq in wordsquares(words, n):
         s = '\n'.join(sq)
         if ispal(s):
-            print s
-            print '--'
+            print(s)
+            print('--')
 
 def tiler( seq ):
     n = len(seq)
@@ -189,7 +190,7 @@ def ptiler( seq ):
     seq = [NW, NE, SW, SE]
     n = len(seq)
     m = len(seq[0])
-    return (' '.join(seq[i+(j*(n/2))][iy] for i in range(n/2)) for j in range(n/2) for iy in range(m))
+    return (' '.join(seq[i+(j*(n//2))][iy] for i in range(n//2)) for j in range(n//2) for iy in range(m))
 
 def ptiler_n( n, seq ):
     for i in range(n):
@@ -273,7 +274,7 @@ def find_more_squares_of_unique_words(squares):
             res.add(sq)
             used |= set(sq)
     missing_words = set(w2s.keys()) - used
-    print "used %s, %s missing" % (len(used), len(missing_words))
+    print("used %s, %s missing" % (len(used), len(missing_words)))
     sorted_words = list(missing_words) + sorted_words
     used = set()
     res = set()
@@ -284,30 +285,31 @@ def find_more_squares_of_unique_words(squares):
             res.add(sq)
             used |= set(sq)
     missing2 = set(w2s.keys()) - used
-    print set(missing_words) == set(missing2)
-    print missing_words
-    print missing2
-    print set(missing_words) ^ set(missing2)
-    print "used %s, %s missing" % (len(used), len(missing_words))
+    print(set(missing_words) == set(missing2))
+    print(missing_words)
+    print(missing2)
+    print(set(missing_words) ^ set(missing2))
+    print("used %s, %s missing" % (len(used), len(missing_words)))
     return res
 
 def test_find_more(n=4):
     squares = list(wordsquares(altpals, n=n))
     psquares = [s for s in squares if ispal(''.join(s))]
     upsquares = sorted(find_more_squares_of_unique_words(psquares))
-    print "got %s squares" %(len(upsquares),)
+    print("got %s squares" %(len(upsquares),))
 
 def print_unique_palindromic_squares(n=4):
     """
     This prints a square consisting of palindromic squares of unique words.
     The super square itself is not palindromic, however.
     """
+    n=int(n)
     squares = list(wordsquares(altpals, n=n))
     psquares = [s for s in squares if ispal(''.join(s))]
     upsquares = sorted(find_squares_of_unique_words(psquares))
-    print "\n".join(spacer(n,tiler(upsquares)))
+    print("\n".join(spacer(n,tiler(upsquares))))
 
-def palindromic_super_word_square(m=6, n=4):
+def palindromic_super_word_square(m=17, n=4):
     """
     This is what I call a palindromic super word square.
     * the entire square is a palindrome
@@ -319,18 +321,18 @@ def palindromic_super_word_square(m=6, n=4):
     """
     n = int(n)
     m = int(m)
-    print "%s palindromic words" % (len(altpals),)
+    print("%s palindromic words" % (len(altpals),))
     words = [w for w in altpals if len(w) == n]
-    print "%s are %s chars" % (len(words), n)
+    print("%s are %s chars" % (len(words), n))
     squares = list(wordsquares(words, n=4))
-    print "%s word squares of palindromic words" % (len(squares),)
+    print("%s word squares of palindromic words" % (len(squares),))
     wsp = [s for s in squares if ispal(''.join(s))]
-    print "%s word squares of palindromes are themselves palindromic" % (len(wsp),)
+    print("%s word squares of palindromes are themselves palindromic" % (len(wsp),))
     words_in_wsp = set([w for s in wsp for w in s])
-    print "%s unique words in palindromic word squares" % (len(words_in_wsp),)
+    print("%s unique words in palindromic word squares" % (len(words_in_wsp),))
     unique_squares = list(find_squares_of_unique_words(wsp))
-    print "%s squares of unique words" % (len(unique_squares),)
-    print "here are %s random palindromic word squares forming a super palindromic word square" % (m,)
+    print("%s squares of unique words" % (len(unique_squares),))
+    print("here are %s random palindromic word squares forming a super palindromic word square" % (m,))
     #selection = [choice(wsp) for i in range(m)]
     shuffle(unique_squares)
     selection = unique_squares[:m]
@@ -340,21 +342,21 @@ def palindromic_super_word_square(m=6, n=4):
 def print_one_nx(n=3):
     n=int(n)
     sq = choice(list(wordsquares(altpals)))
-    print "\n".join(spacer(4,ptiler_n(n,sq)))
+    print("\n".join(spacer(4,ptiler_n(n,sq))))
 
 def nospace(f, *args):
     return globals()[f](*args).replace('\n\n','\n').replace(' ','')
 
 def loop(cmd, *args):
-    print "\x1b[H\x1b[2J",
+    print("\x1b[H\x1b[2J", end=' ')
     while True:
-        print "\x1b[H",
-        print globals()[cmd](*args)
+        print("\x1b[H", end=' ')
+        print(globals()[cmd](*args))
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        print globals()[sys.argv[1]](*sys.argv[2:])
+        print(globals()[sys.argv[1]](*sys.argv[2:]))
     else:
-        print palindromic_super_word_square()
+        print(palindromic_super_word_square())
 #        print nspsws()
 

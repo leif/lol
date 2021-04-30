@@ -3,6 +3,7 @@
 import doctest
 from itertools import groupby, count, islice, repeat, chain
 from operator import add
+from functools import reduce
 
 # combinators, you never know when they'll come in handy
 S,K,I = lambda x:lambda y:lambda z:x(z)(y(z)), lambda x:lambda y:x, lambda x:x
@@ -20,7 +21,7 @@ def ireduce(fn,seq,i=None):
     >>> fib = lambda n: list(islice(ireduce( lambda (a, b), i: (b, a+b),
     ...                                      count(), (0,1)), n,n+1))[0][0]
     >>> fib(0), fib(11)\n    (0, 89)"""
-    cur = (i is not None and [i] or [seq.next()])[0]
+    cur = (i is not None and [i] or [next(seq)])[0]
     for next in seq:
         yield cur
         cur = fn(cur,next)
@@ -64,7 +65,7 @@ ucgi = _("uncurry arguments through the getitem interface",
 # recursive_fib = lambda n,(a,b)=(0,1): a if n==0 else recursive_fib(n-1,(b,a+b))
 naive_fib = Y(lambda f: lambda n: n<2 and 1 or f(n-1)+f(n-2))
 
-fib = lambda n: ncomp(lambda (a,b):(b,a+b))(n)([0,1])[0]
+fib = lambda n: ncomp(lambda a_b:(a_b[1],a_b[0]+a_b[1]))(n)([0,1])[0]
 fib = _(""">>> fib(1500)
 13551125668563101951636936867148408377786010712418497242133543153221487310873528750612259354035717265300373778814347320257699257082356550045349914102924249595997483982228699287527241931811325095099642447621242200209254439920196960465321438498305345893378932585393381539093549479296194800838145996187122583354898000L""", fib)
 

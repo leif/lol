@@ -23,6 +23,8 @@ __author__ = "Leif Ryge <leif@synthesize.us>"
 import time
 import math
 from lnohof import memo
+import codecs
+from base64 import b64decode
 
 try:
     from xtermcolor import colorize
@@ -31,7 +33,7 @@ except:
         return s
 
 # copied from https://en.wikipedia.org/wiki/Legendre_symbol#Table_of_values
-wikipedia_text="""
+wikipedia_text=codecs.getdecoder('zip')(b64decode("""
 eJzFV0FSwzAMvOsVeYJlN3XyF37ADO/gzBN5CZvQKRBb0rrt0IPaSbyW1qu1Cm/Ty/Q6TZMiMqIg
 TogZcUZUxIJYN0xCAKgAKoAKoAKoACqACqACmIHLwGXgMnAZuAxcBi4Dl4HLwJUk5VL68/0DX+m5
 TzL/ef7+3J7Ts95Lvaz8rB5x6X8RonrEaYf9MUtqsj92l+x+bKBt8t5624KH7Jf9TriyRtVaRnGr
@@ -40,14 +42,13 @@ k2TXjNbIKRCMFyCWb8SBu2inEsnkkzweesRjPrFqJfbKjVjLOpzVI5lDrbyi4xqwg0fmdaQ0owGv
 dm9dzgPnZZNGVmesL+c6ssUnzbY48p/UcINXinMfo+D+XuodP4XMzffFdHpX1/iOxtTHOmWT3ikt
 4Z99diHunnNj7Rqy3CES2xm++7+kWt15zk1g7pL7GRtimrbXvkacz6OD2Dbr5AOvcuVlH4FzFFc5
 5A9O9aDViIO81vPt7E8tTavBzN/NTFPWFb0z4h/W29po24eTyvc/eOVK8AqyuBaPx0+n0hd7ngjY
-""".decode('base64').decode('zip').replace('\xe2\x88\x92','-').split('\n')[1:]
-
+"""))[0].replace(b'\xe2\x88\x92',b'-').decode().split('\n')[1:]
 # parse wikipedia text into matrix, and add a zero column
-wikipedia_matrix = [ [0] + map(int, r.split()[1:]) for r in wikipedia_text ]
+wikipedia_matrix = [ [0] + list(map(int, r.split()[1:])) for r in wikipedia_text ]
 
 def render_matrix(m, pallete=None, ticks=False, color=False, minValue=-1, maxValue=1, ticks_x_offset=0):
     """
-    >>> print render_matrix(wikipedia_matrix),
+    >>> print(render_matrix(wikipedia_matrix),)
     _X _X _X _X _X _X _X _X _X _X _
     _X  X_X  X_X  X_X  X_X  X_X  X_
     _XX X  _XX X  _XX X  _XX X  _XX
@@ -92,41 +93,41 @@ def c(v, v_max, pallete=" \\#", color=0):
         fg = (bg + int(color,16)) % ((2**24)-1)
         return colorize(pallete[v], rgb=fg, bg=bg)
     else:
-        return pallete[v]
+        return pallete[int(v)]
 
 def render_ticks(w, base=2, x_offset=0, y_offset=0, pallete="| "):
     """
-    >>> print render_ticks(15)
+    >>> print(render_ticks(15))
     |||||||||||||||   1
     | | | | | | | | - 2
     |   |   |   |   - 4
     |       |       - 8
-    >>> print render_ticks(16)
+    >>> print(render_ticks(16))
     |||||||||||||||| - 1
     | | | | | | | |  - 2
     |   |   |   |    - 4
     |       |        - 8
-    >>> print render_ticks(17)
+    >>> print(render_ticks(17))
     |||||||||||||||||   1
     | | | | | | | | |   2
     |   |   |   |   |   4
     |       |       |   8
     |               | - 16
-    >>> print render_ticks(18)
+    >>> print(render_ticks(18))
     |||||||||||||||||| - 1
     | | | | | | | | |    2
     |   |   |   |   |    4
     |       |       |    8
     |               |  - 16
-    >>> print render_ticks(18, 3)
+    >>> print(render_ticks(18, 3))
     |||||||||||||||||| 1
     |  |  |  |  |  |   3
     |        |         9
-    >>> print render_ticks(18, 3, 4)
+    >>> print(render_ticks(18, 3, 4))
     |||||||||||||||||| 1
       |  |  |  |  |  | 3
          |        |    9
-    >>> print render_ticks(60, math.e/2, 0, 1)
+    >>> print(render_ticks(60, math.e/2, 0, 1))
     |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 1.35914091423
     |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 1.84726402473
     | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |  2.5106921154
@@ -159,7 +160,7 @@ def create_leg_matrix(w, h, x_offset=0, op=0, ticks=0):
 
 def render_legendre(max_a=76, max_p=62, pallete=" #_", ticks=2, x_offset=0, op=0, color=0):
     """
-    >>> print render_legendre(72, 83)
+    >>> print(render_legendre(72, 83))
     |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| - 1
     | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |  - 2
     |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |    - 4
@@ -268,7 +269,10 @@ class MThoma:
     #@memo
     def isPrime(a):
         # lol
-        return all(a % i for i in xrange(2, a))
+        if a != int(a):
+            return False
+        a=int(a)
+        return all(a % i for i in range(2, a))
 
     # http://stackoverflow.com/a/14793082/562769
     @staticmethod
@@ -350,29 +354,29 @@ def lightshow1(w=180, h=60, n=0, pallete=' #', ticks=0, color=0):
     while True:
         n+=1
         m = [ [isPrime((x+n)%(5+y)) for x in range(w)] for y in range(h) ]
-        print CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color)
-        print n
+        print(CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color))
+        print(n)
 
 def lightshow1(w=180, h=60, n=0, pallete=' #', ticks=0, color=0):
     while True:
         n+=1
         m = [ [isPrime((x+n)%(1+y)) for x in range(w)] for y in range(h) ]
-        print CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color)
-        print n
+        print(CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color))
+        print(n)
 
 def lightshow2(w=180, h=60, n=0, pallete=' #', ticks=0, color=0):
     while True:
         n+=1
         m = [ [isPrime((x+n**2)%(1+y)) for x in range(w)] for y in range(h) ]
-        print CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color)
-        print n
+        print(CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color))
+        print(n)
 
 def lightshow3(w=180, h=60, n=0, pallete=' #_|', ticks=0, color=0):
     while True:
         n+=1
         m = [ [isPrime((x+n)%(1+abs(y-int((1+math.sin(n/40.0))*30)))) for x in range(w)] for y in range(h) ]
-        print CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=3, color=color)
-        print n
+        print(CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=3, color=color))
+        print(n)
 
 osc = lambda z, n: (abs((-z*((n/z)%2)) + (n%z)))
 
@@ -380,29 +384,29 @@ def lightshow3a(w=180, h=60, n=0, pallete=' #_|', ticks=0, color=0):
     while True:
         n+=1
         m = [ [isPrime((x+n)%(1+abs(y-osc(60,n) ))) for x in range(w)] for y in range(h) ]
-        print CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=3, color=color)
-        print n
+        print(CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=3, color=color))
+        print(n)
 
 def lightshow4(w=180, h=60, n=0, pallete=' #', ticks=0, color=0):
     while True:
         n+=1
         z=60
         m = [ [isPrime((x+( (10+ osc(z,n) ) **2))%(10+y)) for x in range(w)] for y in range(h) ]
-        print CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color)
-        print n, osc(z,n), n/20
+        print(CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color))
+        print(n, osc(z,n), n/20)
 
 def lightshow5(w=180, h=60, n=0, pallete=' #', ticks=0, color=0):
     while True:
         n+=1
         m = [ [isPrime((x+n*5)%(1+y)) for x in range(w)] for y in range(h) ]
-        print CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color)
-        print n
+        print(CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color))
+        print(n)
 
 def lightshow6(w=180, start=1.05, stop=1.99, steps=1000):
     n=0
     while True:
         n+=1
-        print CL + render_ticks(w, start + (stop-start)*(float(osc(steps,n))/steps))
+        print(CL + render_ticks(w, start + (stop-start)*(float(osc(steps,n))/steps)))
 
 def lightshow7(w=180, h=60, n=0, pallete=' #', ticks=0, color=0):
     while True:
@@ -417,8 +421,8 @@ def lightshow7(w=180, h=60, n=0, pallete=' #', ticks=0, color=0):
             if n%(4*z) >= (2*z) else
             (10-(osc(z,n))**2)
             ))%(10+y)) for x in range(w)] for y in range(h) ]
-        print CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color)
-        print n, osc(z,n), n/20
+        print(CL + render_matrix(m, pallete=pallete, ticks=ticks, minValue=0, maxValue=1, color=color))
+        print(n, osc(z,n), n/20)
 
 
 def bz2_matrix(w, h):
@@ -433,13 +437,13 @@ def bz2_matrix(w, h):
 
 def render_bz2(w=100, h=50):
     m = bz2_matrix(w, h)
-    print render_matrix(m, minValue=0, pallete=" *", ticks=1)
+    print(render_matrix(m, minValue=0, pallete=" *", ticks=1))
 
 def scroll_legendre(max_a=130, max_p=223, pallete=" #_", ticks=0, op=0, color=0):
     n=0
     while True:
         n+=1
-        print CL + render_matrix(create_leg_matrix(max_a, max_p, n, op, ticks), pallete, ticks, color, -1, 1, n)
+        print(CL + render_matrix(create_leg_matrix(max_a, max_p, n, op, ticks), pallete, ticks, color, -1, 1, n))
 
 def test(verbose=0):
     import doctest
@@ -458,7 +462,7 @@ def omghax(x):
 if __name__ == "__main__":
     import sys
     if len(sys.argv) == 1:
-        print "usage: %s <%s> [args]" % (sys.argv[0], "|".join(globals().keys()))
+        print("usage: %s <%s> [args]" % (sys.argv[0], "|".join(list(k for k,v in globals().items() if callable(v)))))
     else:
-        print globals()[sys.argv[1]](*map(omghax,sys.argv[2:]))
+        print(globals()[sys.argv[1]](*list(map(omghax,sys.argv[2:]))))
 

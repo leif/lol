@@ -19,7 +19,8 @@ git commit -m 'merge branch_two into branch_one
 
 This commit changes the contents of the file "foo" to
 "value_three", but this change does not appear in the output
-git log -p unless you use the --first-parent option'
+git log -p unless you use specify a value for --diff-merges
+or use the --first-parent option.'
 echo "
 
 Here is git log -p:

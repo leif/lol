@@ -2,9 +2,7 @@
 """
 
 This was my solution to a programming excercise which someone told me they once
-had to solve during a job interview. I don't recall the details. I belive the
-tests passed when it was written in python2, but they no longer do now that
-2to3 has been run on it.
+had to solve during a job interview. I don't recall the details.
 
 >>> list(unrollSpiral( [[ 1, 2 ],
 ...                     [ 3, 4 ],
@@ -29,12 +27,12 @@ tests passed when it was written in python2, but they no longer do now that
 >>> n = 30
 >>> for m,r1,r2 in ( map(list,(m,unrollSpiral(m),unrollSpiral_slow(m)))
 ...     for m in ( [ [ x+(y*w) for x in range(w) ] for y in range(h) ]
-...     for w in range(1, n) for h in range(w, n) ) for m in ( m, zip(*m) )):
+...     for w in range(1, n) for h in range(w, n) ) for m in ( m, list(zip(*m)) )):
 ...         assert r1==r2, (m,r1,r2)
 """
 
 def spiral( w, h ):
-    for d in range( (min(w,h)+1)/2 ):
+    for d in range( (min(w,h)+1)//2 ):
         for x in range( d, w-d ):
             yield x, d
         for y in range( d+1, h-d ):
@@ -56,11 +54,12 @@ def unrollSpiral_slow( m ):
         m = list(reversed(list(zip(*m[1:]))))
 
 def vis( w, h ):
+    "this used something called vpython from the python2 days which i guess is gone now"
     from visual import sphere, scene
     scene.autocenter=True
     n = float(w*h)
     for i, (x, y) in enumerate( spiral( w, h ) ):
-        sphere( x=x-(w/2.0), y=y-(h/2.0), z=i*0.02, color=(1, 1-(i/n), 0), radius=.5 )
+        sphere( x=x-(w/2.0), y=y-(h/2.0), z=i*0.02, color=(1, 1-(i//n), 0), radius=.5 )
 
 if __name__=="__main__":
     import sys

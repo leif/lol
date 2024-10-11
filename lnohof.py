@@ -18,7 +18,7 @@ def ireduce(fn,seq,i=None):
     """reduce(f,s,i) <=> list(ireduce(f,s,i))[-1]
     Like the builtin reduce, but returns an iterator which returns each step.
     Sequence can be a non-terminating generator (eg, itertools.count):
-    >>> fib = lambda n: list(islice(ireduce( lambda (a, b), i: (b, a+b),
+    >>> fib = lambda n: list(islice(ireduce( lambda ab, i: (ab[1], ab[0]+ab[1]),
     ...                                      count(), (0,1)), n,n+1))[0][0]
     >>> fib(0), fib(11)\n    (0, 89)"""
     cur = (i is not None and [i] or [next(seq)])[0]
@@ -38,8 +38,8 @@ rcomp = lambda f: lambda *a: ireduce(lambda p,fn: [fn(*p)], f, a)
 ncomp = _("""Compose function with itself n times
     ncomp(f)(3)(x) -> f(f(f(x)))
     >>> ncomp(lambda i:i+1)(1005)(42)\n    1047
-    >>> fib = lambda n: ncomp(lambda (a,b)=(0,1):(b,a+b))(n)()[0]
-    >>> fib(47),fib(1500)==fib(1499)+fib(1498)\n    (2971215073L, True)""",
+    >>> fib = lambda n: ncomp(lambda ab=(0,1):(ab[1],ab[0]+ab[1]))(n)()[0]
+    >>> fib(47),fib(1500)==fib(1499)+fib(1498)\n    (2971215073, True)""",
     lambda f: lambda n: compose(*repeat(f,n)))
 
         
@@ -67,7 +67,7 @@ naive_fib = Y(lambda f: lambda n: n<2 and 1 or f(n-1)+f(n-2))
 
 fib = lambda n: ncomp(lambda a_b:(a_b[1],a_b[0]+a_b[1]))(n)([0,1])[0]
 fib = _(""">>> fib(1500)
-13551125668563101951636936867148408377786010712418497242133543153221487310873528750612259354035717265300373778814347320257699257082356550045349914102924249595997483982228699287527241931811325095099642447621242200209254439920196960465321438498305345893378932585393381539093549479296194800838145996187122583354898000L""", fib)
+13551125668563101951636936867148408377786010712418497242133543153221487310873528750612259354035717265300373778814347320257699257082356550045349914102924249595997483982228699287527241931811325095099642447621242200209254439920196960465321438498305345893378932585393381539093549479296194800838145996187122583354898000""", fib)
 
 # 1-d cellular automata
 wfr = _("""wfr(rule, current_state) -> next_state
